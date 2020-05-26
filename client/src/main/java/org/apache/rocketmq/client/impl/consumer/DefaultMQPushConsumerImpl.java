@@ -1115,6 +1115,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
 
     public void adjustThreadPool() {
         long computeAccTotal = this.computeAccumulationTotal();
+        //100000
         long adjustThreadPoolNumsThreshold = this.defaultMQPushConsumer.getAdjustThreadPoolNumsThreshold();
 
         long incThreshold = (long) (adjustThreadPoolNumsThreshold * 1.0);

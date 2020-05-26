@@ -235,7 +235,6 @@ public class MQClientInstance {
                     }
                     // Start request-response channel
                     this.mQClientAPIImpl.start();
-                    // Start various schedule tasks
                     //启动各种定时器
                     this.startScheduledTask();
                     //开启拉取消息的服务
@@ -274,7 +273,7 @@ public class MQClientInstance {
                 }
             }, 1000 * 10, 1000 * 60 * 2, TimeUnit.MILLISECONDS);
         }
-
+        //更新主题的路由信息，默认30秒
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -312,6 +311,7 @@ public class MQClientInstance {
             }
         }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval(), TimeUnit.MILLISECONDS);
 
+        //调整线程池大小（内部实现是空的）
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
