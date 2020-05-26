@@ -42,11 +42,9 @@ public class TransactionProducer {
                 return thread;
             }
         });
-<<<<<<< HEAD
-        producer.setNamesrvAddr("127.0.0.1:9876");
-=======
 
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
+        producer.setNamesrvAddr("127.0.0.1:9876");
+
         producer.setExecutorService(executorService);
         producer.setTransactionListener(transactionListener);
         producer.start();

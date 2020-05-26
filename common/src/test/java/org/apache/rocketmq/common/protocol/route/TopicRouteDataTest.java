@@ -15,11 +15,7 @@
  * limitations under the License.
  */
 
-<<<<<<< HEAD
 package org.apache.rocketmq.common.protocol.route;
-=======
-package org.apache.rocketmq.common.protocol;
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
 
 
 import org.apache.rocketmq.common.protocol.route.BrokerData;

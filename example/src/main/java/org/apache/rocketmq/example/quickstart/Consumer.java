@@ -53,11 +53,9 @@ public class Consumer {
          * Specify where to start in case the specified consumer group is a brand new one.
          */
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-<<<<<<< HEAD
-        consumer.setNamesrvAddr("127.0.0.1:9876");
-=======
 
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
+        consumer.setNamesrvAddr("127.0.0.1:9876");
+
         /*
          * Subscribe one more more topics to consume.
          */

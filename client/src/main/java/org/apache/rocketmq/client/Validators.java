@@ -50,26 +50,17 @@ public class Validators {
      * Validate group
      */
     public static void checkGroup(String group) throws MQClientException {
-<<<<<<< HEAD
         //消费组不能为null
     	if (UtilAll.isBlank(group)) {
             throw new MQClientException("the specified group is blank", null);
         }
     	//消费组不能包含特殊字符 ^[%|a-zA-Z0-9_-]+$
-=======
-        if (UtilAll.isBlank(group)) {
-            throw new MQClientException("the specified group is blank", null);
-        }
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
         if (!regularExpressionMatcher(group, PATTERN)) {
             throw new MQClientException(String.format(
                 "the specified group[%s] contains illegal characters, allowing only %s", group,
                 VALID_PATTERN_STR), null);
         }
-<<<<<<< HEAD
         //长度不能大于255
-=======
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
         if (group.length() > CHARACTER_MAX_LENGTH) {
             throw new MQClientException("the specified group is longer than group max length 255.", null);
         }

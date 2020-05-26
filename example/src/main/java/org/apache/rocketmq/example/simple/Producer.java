@@ -26,20 +26,16 @@ public class Producer {
     public static void main(String[] args) throws MQClientException, InterruptedException {
 
         DefaultMQProducer producer = new DefaultMQProducer("ProducerGroupName");
-<<<<<<< HEAD
+
         producer.setNamesrvAddr("127.0.0.1:9876");
-=======
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
+
         producer.start();
 
         for (int i = 0; i < 128; i++)
             try {
                 {
-<<<<<<< HEAD
+
                     Message msg = new Message("TopicTest1",
-=======
-                    Message msg = new Message("TopicTest",
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                         "TagA",
                         "OrderID188",
                         "Hello world".getBytes(RemotingHelper.DEFAULT_CHARSET));

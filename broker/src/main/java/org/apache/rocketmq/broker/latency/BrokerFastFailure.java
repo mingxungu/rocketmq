@@ -109,14 +109,8 @@ public class BrokerFastFailure {
                     if (rt == null || rt.isStopRun()) {
                         break;
                     }
-<<<<<<< HEAD
-                    
-                    final long behind = System.currentTimeMillis() - rt.getCreateTimestamp();
                     //即消息追加到内存中的超时时间大于200ms
-=======
-
                     final long behind = System.currentTimeMillis() - rt.getCreateTimestamp();
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     if (behind >= maxWaitTimeMillsInQueue) {
                         if (blockingQueue.remove(runnable)) {
                             rt.setStopRun(true);

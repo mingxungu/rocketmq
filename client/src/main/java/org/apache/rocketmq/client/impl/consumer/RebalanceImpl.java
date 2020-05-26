@@ -258,13 +258,9 @@ public abstract class RebalanceImpl {
                 break;
             }
             case CLUSTERING: {
-<<<<<<< HEAD
             	//1.从topicSubscribeInfoTable列表中获取与该topic相关的所有消息队列
                 Set<MessageQueue> mqSet = this.topicSubscribeInfoTable.get(topic);
                 //2.从broker端获取消费该消费组的所有客户端clientId
-=======
-                Set<MessageQueue> mqSet = this.topicSubscribeInfoTable.get(topic);
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                 List<String> cidAll = this.mQClientFactory.findConsumerIdList(topic, consumerGroup);
                 if (null == mqSet) {
                     if (!topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
@@ -282,15 +278,10 @@ public abstract class RebalanceImpl {
 
                     Collections.sort(mqAll);
                     Collections.sort(cidAll);
-<<<<<<< HEAD
+
                     //3.创建DefaultMQPushConsumer对象时默认设置为AllocateMessageQueueAveragely
                     AllocateMessageQueueStrategy strategy = this.allocateMessageQueueStrategy;
                     //4.调用AllocateMessageQueueAveragely.allocate方法，获取当前client分配消费队列
-=======
-
-                    AllocateMessageQueueStrategy strategy = this.allocateMessageQueueStrategy;
-
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     List<MessageQueue> allocateResult = null;
                     try {
                         allocateResult = strategy.allocate(
@@ -303,20 +294,12 @@ public abstract class RebalanceImpl {
                             e);
                         return;
                     }
-<<<<<<< HEAD
                     //5.将分配得到的allocateResult 中的队列放入allocateResultSet 集合
-=======
-
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     Set<MessageQueue> allocateResultSet = new HashSet<MessageQueue>();
                     if (allocateResult != null) {
                         allocateResultSet.addAll(allocateResult);
                     }
-<<<<<<< HEAD
                     //6.更新updateProcessQueue
-=======
-
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     boolean changed = this.updateProcessQueueTableInRebalance(topic, allocateResultSet, isOrder);
                     if (changed) {
                         log.info(
@@ -359,10 +342,7 @@ public abstract class RebalanceImpl {
             ProcessQueue pq = next.getValue();
 
             if (mq.getTopic().equals(topic)) {
-<<<<<<< HEAD
             	//当前topic所在的队列,不在重平衡后的分配的队列不在mqSet中
-=======
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                 if (!mqSet.contains(mq)) {
                     pq.setDropped(true);
                     if (this.removeUnnecessaryMessageQueue(mq, pq)) {
@@ -370,11 +350,7 @@ public abstract class RebalanceImpl {
                         changed = true;
                         log.info("doRebalance, {}, remove unnecessary mq, {}", consumerGroup, mq);
                     }
-<<<<<<< HEAD
                 } else if (pq.isPullExpired()) {//在拉取的时候更新lastPullTimestamp的值，然后在rebalance的时候会去判断ProcessQueue已经超过一定的时间没有去拉取消息，如果是的话移除
-=======
-                } else if (pq.isPullExpired()) {
->>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     switch (this.consumeType()) {
                         case CONSUME_ACTIVELY:
                             break;

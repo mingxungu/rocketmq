@@ -503,7 +503,7 @@ public class BrokerController {
         for (AccessValidator accessValidator: accessValidators) {
             final AccessValidator validator = accessValidator;
             this.registerServerRPCHook(new RPCHook() {
-
+            	
                 @Override
                 public void doBeforeRequest(String remoteAddr, RemotingCommand request) {
                     //Do not catch the exception
