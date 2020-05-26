@@ -16,7 +16,10 @@
  */
 package org.apache.rocketmq.client.impl.consumer;
 
+<<<<<<< HEAD
 import java.util.Date;
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -94,7 +97,10 @@ public class PullMessageService extends ServiceThread {
         while (!this.isStopped()) {
             try {
                 PullRequest pullRequest = this.pullRequestQueue.take();
+<<<<<<< HEAD
                 System.out.println("====自己加的LOG=====开始拉取消息=="+pullRequest.getMessageQueue().getTopic()+",时间="+new Date());
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                 this.pullMessage(pullRequest);
             } catch (InterruptedException ignored) {
             } catch (Exception e) {

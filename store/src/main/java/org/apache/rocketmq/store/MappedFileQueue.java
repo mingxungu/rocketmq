@@ -472,14 +472,21 @@ public class MappedFileQueue {
                         this.mappedFileSize,
                         this.mappedFiles.size());
                 } else {
+<<<<<<< HEAD
                 	//获取下标
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     int index = (int) ((offset / this.mappedFileSize) - (firstMappedFile.getFileFromOffset() / this.mappedFileSize));
                     MappedFile targetFile = null;
                     try {
                         targetFile = this.mappedFiles.get(index);
                     } catch (Exception ignored) {
                     }
+<<<<<<< HEAD
                     //做了一次校验
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     if (targetFile != null && offset >= targetFile.getFileFromOffset()
                         && offset < targetFile.getFileFromOffset() + this.mappedFileSize) {
                         return targetFile;

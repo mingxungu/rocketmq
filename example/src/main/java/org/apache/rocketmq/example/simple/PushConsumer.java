@@ -31,9 +31,14 @@ public class PushConsumer {
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("CID_JODIE_1");
         consumer.subscribe("TopicTest", "*");
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
+<<<<<<< HEAD
         consumer.setNamesrvAddr("127.0.0.1:9876");
         //wrong time format 2017_0422_221800
         //consumer.setConsumeTimestamp("20181109221800");
+=======
+        //wrong time format 2017_0422_221800
+        consumer.setConsumeTimestamp("20181109221800");
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         consumer.registerMessageListener(new MessageListenerConcurrently() {
 
             @Override

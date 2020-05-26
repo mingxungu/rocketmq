@@ -53,7 +53,11 @@ public class HAService {
 
     private final WaitNotifyObject waitNotifyObject = new WaitNotifyObject();
     private final AtomicLong push2SlaveMaxOffset = new AtomicLong(0);
+<<<<<<< HEAD
     //主从同步通知实现类
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
     private final GroupTransferService groupTransferService;
 
     private final HAClient haClient;

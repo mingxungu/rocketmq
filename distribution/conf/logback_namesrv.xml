@@ -19,10 +19,17 @@
 <configuration>
     <appender name="DefaultAppender"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
+<<<<<<< HEAD
         <file>D:/WorkSoft/rocketmqdata/logs/rocketmqlogs/namesrv_default.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>D:/WorkSoft/rocketmqdata/logs/rocketmqlogs/otherdays/namesrv_default.%i.log.gz</fileNamePattern>
+=======
+        <file>${user.home}/logs/rocketmqlogs/namesrv_default.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${user.home}/logs/rocketmqlogs/otherdays/namesrv_default.%i.log.gz</fileNamePattern>
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             <minIndex>1</minIndex>
             <maxIndex>5</maxIndex>
         </rollingPolicy>
@@ -38,10 +45,17 @@
 
     <appender name="RocketmqNamesrvAppender_inner"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
+<<<<<<< HEAD
         <file>D:/WorkSoft/rocketmqdata/logs/rocketmqlogs/namesrv.log</file>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>D:/WorkSoft/rocketmqdata/logs/rocketmqlogs/otherdays/namesrv.%i.log.gz</fileNamePattern>
+=======
+        <file>${user.home}/logs/rocketmqlogs/namesrv.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${user.home}/logs/rocketmqlogs/otherdays/namesrv.%i.log.gz</fileNamePattern>
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             <minIndex>1</minIndex>
             <maxIndex>5</maxIndex>
         </rollingPolicy>

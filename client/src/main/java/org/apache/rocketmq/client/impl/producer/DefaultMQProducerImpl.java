@@ -1182,12 +1182,18 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         Validators.checkMessage(msg, this.defaultMQProducer);
 
         SendResult sendResult = null;
+<<<<<<< HEAD
         //添加消息的事务属性TRAN_MSG=true
         MessageAccessor.putProperty(msg, MessageConst.PROPERTY_TRANSACTION_PREPARED, "true");
         //添加消息的事务属性PGROUP为生产者组名
         MessageAccessor.putProperty(msg, MessageConst.PROPERTY_PRODUCER_GROUP, this.defaultMQProducer.getProducerGroup());
         try {
         	//发送消息的核心代码
+=======
+        MessageAccessor.putProperty(msg, MessageConst.PROPERTY_TRANSACTION_PREPARED, "true");
+        MessageAccessor.putProperty(msg, MessageConst.PROPERTY_PRODUCER_GROUP, this.defaultMQProducer.getProducerGroup());
+        try {
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             sendResult = this.send(msg);
         } catch (Exception e) {
             throw new MQClientException("send message Exception", e);
@@ -1199,7 +1205,10 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             case SEND_OK: {
                 try {
                     if (sendResult.getTransactionId() != null) {
+<<<<<<< HEAD
                     	//设置消息的属性__transactionId__
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                         msg.putUserProperty("__transactionId__", sendResult.getTransactionId());
                     }
                     String transactionId = msg.getProperty(MessageConst.PROPERTY_UNIQ_CLIENT_MESSAGE_ID_KEYIDX);
@@ -1210,13 +1219,20 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                         localTransactionState = localTransactionExecuter.executeLocalTransactionBranch(msg, arg);
                     } else if (transactionListener != null) {
                         log.debug("Used new transaction API");
+<<<<<<< HEAD
                         //执行本地的事务获取本地事务状态
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                         localTransactionState = transactionListener.executeLocalTransaction(msg, arg);
                     }
                     if (null == localTransactionState) {
                         localTransactionState = LocalTransactionState.UNKNOW;
                     }
+<<<<<<< HEAD
                     //
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     if (localTransactionState != LocalTransactionState.COMMIT_MESSAGE) {
                         log.info("executeLocalTransactionBranch return {}", localTransactionState);
                         log.info(msg.toString());
@@ -1238,12 +1254,19 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         }
 
         try {
+<<<<<<< HEAD
         	//发送给Broker事务消息的状态
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             this.endTransaction(sendResult, localTransactionState, localException);
         } catch (Exception e) {
             log.warn("local transaction execute " + localTransactionState + ", but end broker transaction failed", e);
         }
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         TransactionSendResult transactionSendResult = new TransactionSendResult();
         transactionSendResult.setSendStatus(sendResult.getSendStatus());
         transactionSendResult.setMessageQueue(sendResult.getMessageQueue());

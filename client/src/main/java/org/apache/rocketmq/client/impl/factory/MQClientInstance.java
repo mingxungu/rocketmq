@@ -236,11 +236,18 @@ public class MQClientInstance {
                     // Start request-response channel
                     this.mQClientAPIImpl.start();
                     // Start various schedule tasks
+<<<<<<< HEAD
                     //启动各种定时器
                     this.startScheduledTask();
                     //开启拉取消息的服务
                     this.pullMessageService.start();
                     //开始再平衡服务
+=======
+                    this.startScheduledTask();
+                    // Start pull service
+                    this.pullMessageService.start();
+                    // Start rebalance service
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                     this.rebalanceService.start();
                     // Start push service
                     this.defaultMQProducer.getDefaultMQProducerImpl().start(false);
@@ -260,7 +267,10 @@ public class MQClientInstance {
     }
 
     private void startScheduledTask() {
+<<<<<<< HEAD
     	//定时获取name server address地址信息 2分钟获取一次
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         if (null == this.clientConfig.getNamesrvAddr()) {
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -287,7 +297,10 @@ public class MQClientInstance {
             }
         }, 10, this.clientConfig.getPollNameServerInterval(), TimeUnit.MILLISECONDS);
 
+<<<<<<< HEAD
         //给所有broker发送心跳（默认30秒，可配置）
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -301,7 +314,10 @@ public class MQClientInstance {
             }
         }, 1000, this.clientConfig.getHeartbeatBrokerInterval(), TimeUnit.MILLISECONDS);
 
+<<<<<<< HEAD
         //持久化消息消费进度，默认5秒保存一次
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override

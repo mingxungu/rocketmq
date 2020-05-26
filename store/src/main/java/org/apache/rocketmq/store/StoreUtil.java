@@ -27,7 +27,10 @@ public class StoreUtil {
         long physicalTotal = 1024 * 1024 * 1024 * 24L;
         OperatingSystemMXBean osmxb = ManagementFactory.getOperatingSystemMXBean();
         if (osmxb instanceof com.sun.management.OperatingSystemMXBean) {
+<<<<<<< HEAD
         	//获取操作系统总的物理内存
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             physicalTotal = ((com.sun.management.OperatingSystemMXBean) osmxb).getTotalPhysicalMemorySize();
         }
 

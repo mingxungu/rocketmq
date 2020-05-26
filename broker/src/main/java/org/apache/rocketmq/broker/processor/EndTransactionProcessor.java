@@ -192,9 +192,13 @@ public class EndTransactionProcessor implements NettyRequestProcessor {
 
     private MessageExtBrokerInner endMessageTransaction(MessageExt msgExt) {
         MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
+<<<<<<< HEAD
         //设置消息的原来的主题从消息的属性中获取，在消息发送时设置的，前面分析过
         msgInner.setTopic(msgExt.getUserProperty(MessageConst.PROPERTY_REAL_TOPIC));
         //设置消息的原来的队列的ID从消息的属性中获取，在消息发送时设置的，前面分析过
+=======
+        msgInner.setTopic(msgExt.getUserProperty(MessageConst.PROPERTY_REAL_TOPIC));
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         msgInner.setQueueId(Integer.parseInt(msgExt.getUserProperty(MessageConst.PROPERTY_REAL_QUEUE_ID)));
         msgInner.setBody(msgExt.getBody());
         msgInner.setFlag(msgExt.getFlag());

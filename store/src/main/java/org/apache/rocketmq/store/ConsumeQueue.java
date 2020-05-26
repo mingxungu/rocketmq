@@ -38,7 +38,11 @@ public class ConsumeQueue {
     private final ByteBuffer byteBufferIndex;
 
     private final String storePath;
+<<<<<<< HEAD
     private final int mappedFileSize; ////文件大小，默认30w * 20字节 = 600w字节
+=======
+    private final int mappedFileSize;
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
     private long maxPhysicOffset = -1;
     private volatile long minLogicOffset = 0;
     private ConsumeQueueExt consumeQueueExt = null;
@@ -484,12 +488,18 @@ public class ConsumeQueue {
     }
 
     public SelectMappedBufferResult getIndexBuffer(final long startIndex) {
+<<<<<<< HEAD
     	//默认的mappedFile的大小  30w * 20字节 = 600w字节
         int mappedFileSize = this.mappedFileSize;
         //consumequeue 存储的每一个条目是20字节
         long offset = startIndex * CQ_STORE_UNIT_SIZE;
         if (offset >= this.getMinLogicOffset()) {
         	//找到 MappedFile
+=======
+        int mappedFileSize = this.mappedFileSize;
+        long offset = startIndex * CQ_STORE_UNIT_SIZE;
+        if (offset >= this.getMinLogicOffset()) {
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             MappedFile mappedFile = this.mappedFileQueue.findMappedFileByOffset(offset);
             if (mappedFile != null) {
                 SelectMappedBufferResult result = mappedFile.selectMappedBuffer((int) (offset % mappedFileSize));

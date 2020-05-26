@@ -546,11 +546,19 @@ public class CommitLog {
 
         String topic = msg.getTopic();
         int queueId = msg.getQueueId();
+<<<<<<< HEAD
         //获取消息类型
         final int tranType = MessageSysFlag.getTransactionValue(msg.getSysFlag());
         if (tranType == MessageSysFlag.TRANSACTION_NOT_TYPE //非事务消息或Commit消息
             || tranType == MessageSysFlag.TRANSACTION_COMMIT_TYPE) {
             // 判断消息是否是延迟消息
+=======
+
+        final int tranType = MessageSysFlag.getTransactionValue(msg.getSysFlag());
+        if (tranType == MessageSysFlag.TRANSACTION_NOT_TYPE
+            || tranType == MessageSysFlag.TRANSACTION_COMMIT_TYPE) {
+            // Delay Delivery
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             if (msg.getDelayTimeLevel() > 0) {
                 if (msg.getDelayTimeLevel() > this.defaultMessageStore.getScheduleMessageService().getMaxDelayLevel()) {
                     msg.setDelayTimeLevel(this.defaultMessageStore.getScheduleMessageService().getMaxDelayLevel());
@@ -571,9 +579,14 @@ public class CommitLog {
 
         long eclipseTimeInLock = 0;
         MappedFile unlockMappedFile = null;
+<<<<<<< HEAD
         // 获取一个MappedFile对象，内存映射的具体实现
         MappedFile mappedFile = this.mappedFileQueue.getLastMappedFile();
         //加锁
+=======
+        MappedFile mappedFile = this.mappedFileQueue.getLastMappedFile();
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         putMessageLock.lock(); //spin or ReentrantLock ,depending on store config
         try {
             long beginLockTimestamp = this.defaultMessageStore.getSystemClock().now();
@@ -582,7 +595,11 @@ public class CommitLog {
             // Here settings are stored timestamp, in order to ensure an orderly
             // global
             msg.setStoreTimestamp(beginLockTimestamp);
+<<<<<<< HEAD
             //验证MappedFile对象，获取一个可用的MappedFile(如果没有，则创建一个)
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             if (null == mappedFile || mappedFile.isFull()) {
                 mappedFile = this.mappedFileQueue.getLastMappedFile(0); // Mark: NewFile may be cause noise
             }
@@ -591,7 +608,11 @@ public class CommitLog {
                 beginTimeInLock = 0;
                 return new PutMessageResult(PutMessageStatus.CREATE_MAPEDFILE_FAILED, null);
             }
+<<<<<<< HEAD
             //通过MappedFile对象写入文件
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
             result = mappedFile.appendMessage(msg, this.appendMessageCallback);
             switch (result.getStatus()) {
                 case PUT_OK:
@@ -639,10 +660,17 @@ public class CommitLog {
         // Statistics
         storeStatsService.getSinglePutMessageTopicTimesTotal(msg.getTopic()).incrementAndGet();
         storeStatsService.getSinglePutMessageTopicSizeTotal(topic).addAndGet(result.getWroteBytes());
+<<<<<<< HEAD
         //根据刷盘策略刷盘
         handleDiskFlush(result, putMessageResult, msg);
         //主从数据同步
         handleHA(result, putMessageResult, msg);
+=======
+
+        handleDiskFlush(result, putMessageResult, msg);
+        handleHA(result, putMessageResult, msg);
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         return putMessageResult;
     }
 
@@ -674,7 +702,10 @@ public class CommitLog {
     }
 
     public void handleHA(AppendMessageResult result, PutMessageResult putMessageResult, MessageExt messageExt) {
+<<<<<<< HEAD
     	//获取当前Broker的角色是否是SYNC_MASTER同步双写
+=======
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
         if (BrokerRole.SYNC_MASTER == this.defaultMessageStore.getMessageStoreConfig().getBrokerRole()) {
             HAService service = this.defaultMessageStore.getHaService();
             if (messageExt.isWaitStoreMsgOK()) {
@@ -691,12 +722,20 @@ public class CommitLog {
                         putMessageResult.setPutMessageStatus(PutMessageStatus.FLUSH_SLAVE_TIMEOUT);
                     }
                 }
+<<<<<<< HEAD
+=======
+                // Slave problem
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
                 else {
                     // Tell the producer, slave not available
                     putMessageResult.setPutMessageStatus(PutMessageStatus.SLAVE_NOT_AVAILABLE);
                 }
             }
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 092a639528a99b4639438059a9c684281f428c32
     }
 
     public PutMessageResult putMessages(final MessageExtBatch messageExtBatch) {
