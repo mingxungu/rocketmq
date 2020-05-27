@@ -93,8 +93,9 @@ public class PullMessageService extends ServiceThread {
 
         while (!this.isStopped()) {
             try {
+            	//从队列中获取，拉取请求（消息队列、处理队列、消费组信息）
                 PullRequest pullRequest = this.pullRequestQueue.take();
-                System.out.println("====自己加的LOG=====开始拉取消息=="+pullRequest.getMessageQueue().getTopic()+",时间="+new Date());
+                //拉取消息（核心方法）
                 this.pullMessage(pullRequest);
             } catch (InterruptedException ignored) {
             } catch (Exception e) {
