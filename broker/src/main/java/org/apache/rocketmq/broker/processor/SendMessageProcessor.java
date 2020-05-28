@@ -136,7 +136,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             response.setRemark(null);
             return response;
         }
-
+        //构建延迟主题的名
         String newTopic = MixAll.getRetryTopic(requestHeader.getGroup());
         int queueIdInt = Math.abs(this.random.nextInt() % 99999999) % subscriptionGroupConfig.getRetryQueueNums();
 
@@ -144,7 +144,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
         if (requestHeader.isUnitMode()) {
             topicSysFlag = TopicSysFlag.buildSysFlag(false, true);
         }
-
+        //构建延迟主题的配置
         TopicConfig topicConfig = this.brokerController.getTopicConfigManager().createTopicInSendMessageBackMethod(
             newTopic,
             subscriptionGroupConfig.getRetryQueueNums(),
@@ -160,7 +160,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             response.setRemark(String.format("the topic[%s] sending message is forbidden", newTopic));
             return response;
         }
-
+        //根据偏移量从broker上获取这个消息
         MessageExt msgExt = this.brokerController.getMessageStore().lookMessageByOffset(requestHeader.getOffset());
         if (null == msgExt) {
             response.setCode(ResponseCode.SYSTEM_ERROR);
@@ -169,6 +169,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
         }
 
         final String retryTopic = msgExt.getProperty(MessageConst.PROPERTY_RETRY_TOPIC);
+        //设置消息的属性为延迟消息
         if (null == retryTopic) {
             MessageAccessor.putProperty(msgExt, MessageConst.PROPERTY_RETRY_TOPIC, msgExt.getTopic());
         }
@@ -220,7 +221,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
 
         String originMsgId = MessageAccessor.getOriginMessageId(msgExt);
         MessageAccessor.setOriginMessageId(msgInner, UtilAll.isBlank(originMsgId) ? msgExt.getMsgId() : originMsgId);
-
+        //消息持久化到broker中
         PutMessageResult putMessageResult = this.brokerController.getMessageStore().putMessage(msgInner);
         if (putMessageResult != null) {
             switch (putMessageResult.getPutMessageStatus()) {

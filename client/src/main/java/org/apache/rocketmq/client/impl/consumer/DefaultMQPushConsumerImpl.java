@@ -325,10 +325,12 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                         case FOUND:
                             long prevRequestOffset = pullRequest.getNextOffset();
                             pullRequest.setNextOffset(pullResult.getNextBeginOffset());
+                            //本次从broker拉取消息的时间
                             long pullRT = System.currentTimeMillis() - beginTimestamp;
                             DefaultMQPushConsumerImpl.this.getConsumerStatsManager().incPullRT(pullRequest.getConsumerGroup(),
                                 pullRequest.getMessageQueue().getTopic(), pullRT);
                             long firstMsgOffset = Long.MAX_VALUE;
+                            //判断拉取消息的内容是否为null
                             if (pullResult.getMsgFoundList() == null || pullResult.getMsgFoundList().isEmpty()) {
                                 DefaultMQPushConsumerImpl.this.executePullRequestImmediately(pullRequest);
                             } else {
@@ -337,14 +339,15 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
 
                                 DefaultMQPushConsumerImpl.this.getConsumerStatsManager().incPullTPS(pullRequest.getConsumerGroup(),
                                     pullRequest.getMessageQueue().getTopic(), pullResult.getMsgFoundList().size());
-
+                                //分发到Consume中
                                 boolean dispatchToConsume = processQueue.putMessage(pullResult.getMsgFoundList());
+                                //核心方法，处理消息的消费和消费状态后的处理
                                 DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
                                     pullResult.getMsgFoundList(),
                                     processQueue,
                                     pullRequest.getMessageQueue(),
                                     dispatchToConsume);
-
+                                //每次拉取的间隔时间，默认是0，立刻拉取（回收pullRequest）
                                 if (DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval() > 0) {
                                     DefaultMQPushConsumerImpl.this.executePullRequestLater(pullRequest,
                                         DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval());
@@ -532,11 +535,12 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         try {
             String brokerAddr = (null != brokerName) ? this.mQClientFactory.findBrokerAddressInPublish(brokerName)
                 : RemotingHelper.parseSocketAddressAddr(msg.getStoreHost());
+            //发送失败的消息进入，延迟队列，此时延迟级别还是0，服务端会加3
             this.mQClientFactory.getMQClientAPIImpl().consumerSendMessageBack(brokerAddr, msg,
                 this.defaultMQPushConsumer.getConsumerGroup(), delayLevel, 5000, getMaxReconsumeTimes());
         } catch (Exception e) {
             log.error("sendMessageBack Exception, " + this.defaultMQPushConsumer.getConsumerGroup(), e);
-
+            //构建延迟队列的消息信息
             Message newMsg = new Message(MixAll.getRetryTopic(this.defaultMQPushConsumer.getConsumerGroup()), msg.getBody());
 
             String originMsgId = MessageAccessor.getOriginMessageId(msg);
@@ -548,7 +552,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             MessageAccessor.setReconsumeTime(newMsg, String.valueOf(msg.getReconsumeTimes() + 1));
             MessageAccessor.setMaxReconsumeTimes(newMsg, String.valueOf(getMaxReconsumeTimes()));
             newMsg.setDelayTimeLevel(3 + msg.getReconsumeTimes());
-
+            //失败了就构建本地客户端的producer发送到broker
             this.mQClientFactory.getDefaultMQProducer().send(newMsg);
         } finally {
             msg.setTopic(NamespaceUtil.withoutNamespace(msg.getTopic(), this.defaultMQPushConsumer.getNamespace()));
@@ -635,6 +639,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                         new ConsumeMessageOrderlyService(this, (MessageListenerOrderly) this.getMessageListenerInner());
                 } else if (this.getMessageListenerInner() instanceof MessageListenerConcurrently) {
                     this.consumeOrderly = false;
+                    //创建ConsumeMessageConcurrentlyService将Listenern设置进去
                     this.consumeMessageService =
                         new ConsumeMessageConcurrentlyService(this, (MessageListenerConcurrently) this.getMessageListenerInner());
                 }
