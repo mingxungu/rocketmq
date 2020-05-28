@@ -217,6 +217,7 @@ public abstract class RebalanceImpl {
     }
 
     public void doRebalance(final boolean isOrder) {
+    	//消费者的订阅信息(集群模式下包含重试主题)
         Map<String, SubscriptionData> subTable = this.getSubscriptionInner();
         if (subTable != null) {
             for (final Map.Entry<String, SubscriptionData> entry : subTable.entrySet()) {
@@ -260,7 +261,7 @@ public abstract class RebalanceImpl {
             case CLUSTERING: {
             	//1.从topicSubscribeInfoTable列表中获取与该topic相关的所有消息队列
                 Set<MessageQueue> mqSet = this.topicSubscribeInfoTable.get(topic);
-                //2.从broker端获取消费该消费组的所有客户端clientId
+                //2.从broker端获取消费该消费组的所有客户端clientId，每个消费者都需要向broker发送心跳包
                 List<String> cidAll = this.mQClientFactory.findConsumerIdList(topic, consumerGroup);
                 if (null == mqSet) {
                     if (!topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
@@ -369,7 +370,7 @@ public abstract class RebalanceImpl {
                 }
             }
         }
-
+        //构建PullRequest列表
         List<PullRequest> pullRequestList = new ArrayList<PullRequest>();
         for (MessageQueue mq : mqSet) {
             if (!this.processQueueTable.containsKey(mq)) {
@@ -379,6 +380,7 @@ public abstract class RebalanceImpl {
                 }
 
                 this.removeDirtyOffset(mq);
+                //新建处理队列对象
                 ProcessQueue pq = new ProcessQueue();
                 long nextOffset = this.computePullFromWhere(mq);
                 if (nextOffset >= 0) {
@@ -400,7 +402,7 @@ public abstract class RebalanceImpl {
                 }
             }
         }
-
+        //很重要将分配好的消息队列放到PullMessageService.pullRequestQueue队列中（PullMessageService消息拉取的核心类）
         this.dispatchPullRequest(pullRequestList);
 
         return changed;

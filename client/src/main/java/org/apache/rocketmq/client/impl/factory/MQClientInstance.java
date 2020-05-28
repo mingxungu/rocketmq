@@ -142,14 +142,14 @@ public class MQClientInstance {
         this.clientId = clientId;
 
         this.mQAdminImpl = new MQAdminImpl(this);
-
+        //拉取消息的服务类（线程类）
         this.pullMessageService = new PullMessageService(this);
-
+        //消费重平衡服务类（线程类）
         this.rebalanceService = new RebalanceService(this);
-
+        //用于消费失败后发送给broker端的延迟消息
         this.defaultMQProducer = new DefaultMQProducer(MixAll.CLIENT_INNER_PRODUCER_GROUP);
         this.defaultMQProducer.resetClientConfig(clientConfig);
-
+        //消费状态管理类
         this.consumerStatsManager = new ConsumerStatsManager(this.scheduledExecutorService);
 
         log.info("Created a new client Instance, InstanceIndex:{}, ClientID:{}, ClientConfig:{}, ClientVersion:{}, SerializerType:{}",
@@ -237,9 +237,9 @@ public class MQClientInstance {
                     this.mQClientAPIImpl.start();
                     //启动各种定时器
                     this.startScheduledTask();
-                    //开启拉取消息的服务
+                    //开启拉取消息的服务（还没进行重平衡pullRequestQueue里面是空）
                     this.pullMessageService.start();
-                    //开始再平衡服务
+                    //开始再平衡服务（等待20秒进行重平衡）
                     this.rebalanceService.start();
                     // Start push service
                     this.defaultMQProducer.getDefaultMQProducerImpl().start(false);

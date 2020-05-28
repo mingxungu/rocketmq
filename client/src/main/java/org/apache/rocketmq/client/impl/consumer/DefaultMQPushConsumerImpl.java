@@ -102,6 +102,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
     private final ArrayList<ConsumeMessageHook> consumeMessageHookList = new ArrayList<ConsumeMessageHook>();
     private final RPCHook rpcHook;
     private volatile ServiceState serviceState = ServiceState.CREATE_JUST;
+    //客户端实例
     private MQClientInstance mQClientFactory;
     private PullAPIWrapper pullAPIWrapper;
     private volatile boolean pause = false;
@@ -334,12 +335,13 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                             if (pullResult.getMsgFoundList() == null || pullResult.getMsgFoundList().isEmpty()) {
                                 DefaultMQPushConsumerImpl.this.executePullRequestImmediately(pullRequest);
                             } else {
+                            	//服务端限制了本次拉取的数量（默认32）和消息总的大小（默认100M）
                             	System.out.println("======拉取的消息个数===="+pullResult.getMsgFoundList().size());
                                 firstMsgOffset = pullResult.getMsgFoundList().get(0).getQueueOffset();
 
                                 DefaultMQPushConsumerImpl.this.getConsumerStatsManager().incPullTPS(pullRequest.getConsumerGroup(),
                                     pullRequest.getMessageQueue().getTopic(), pullResult.getMsgFoundList().size());
-                                //分发到Consume中
+                                
                                 boolean dispatchToConsume = processQueue.putMessage(pullResult.getMsgFoundList());
                                 //核心方法，处理消息的消费和消费状态后的处理
                                 DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
@@ -347,7 +349,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                                     processQueue,
                                     pullRequest.getMessageQueue(),
                                     dispatchToConsume);
-                                //每次拉取的间隔时间，默认是0，立刻拉取（回收pullRequest）
+                                //每次拉取的间隔时间，默认是0，立刻拉取消息（回收pullRequest）
                                 if (DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval() > 0) {
                                     DefaultMQPushConsumerImpl.this.executePullRequestLater(pullRequest,
                                         DefaultMQPushConsumerImpl.this.defaultMQPushConsumer.getPullInterval());
@@ -602,7 +604,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                 if (this.defaultMQPushConsumer.getMessageModel() == MessageModel.CLUSTERING) {
                     this.defaultMQPushConsumer.changeInstanceNameToPID();
                 }
-                //获取或者创建客户端实例
+                //获取或者创建客户端实例（很重要）
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQPushConsumer, this.rpcHook);
                 //完善rebalanceImpl实例
                 this.rebalanceImpl.setConsumerGroup(this.defaultMQPushConsumer.getConsumerGroup());
@@ -669,13 +671,13 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             default:
                 break;
         }
-        //更新订阅信息
+        //更新该主题的路由信息订阅信息
         this.updateTopicSubscribeInfoWhenSubscriptionChanged();
-        //检测broker状态
+        //检测客户端的consumer一些配置在broker端进行校验
         this.mQClientFactory.checkClientInBroker();
-        //发送心跳包
+        //客户端发送心跳包给broker
         this.mQClientFactory.sendHeartbeatToAllBrokerWithLock();
-        //重新负载
+        //消息消费重新负载
         this.mQClientFactory.rebalanceImmediately();
     }
 
