@@ -88,23 +88,23 @@ public class PullMessageService extends ServiceThread {
     }
 
     @Override
-    public void run() {
-        log.info(this.getServiceName() + " service started");
-
-        while (!this.isStopped()) {
-            try {
-            	//从队列中获取，拉取请求（消息队列、处理队列、消费组信息）
-                PullRequest pullRequest = this.pullRequestQueue.take();
-                //拉取消息（核心方法）
-                this.pullMessage(pullRequest);
-            } catch (InterruptedException ignored) {
-            } catch (Exception e) {
-                log.error("Pull Message Service Run Method exception", e);
-            }
-        }
-
-        log.info(this.getServiceName() + " service end");
-    }
+	public void run() {
+	    log.info(this.getServiceName() + " service started");
+	
+	    while (!this.isStopped()) {
+	        try {
+	        	//从队列中获取，拉取请求（消息队列、处理队列、消费组信息）
+	            PullRequest pullRequest = this.pullRequestQueue.take();
+	            //拉取消息（核心方法）
+	            this.pullMessage(pullRequest);
+	        } catch (InterruptedException ignored) {
+	        } catch (Exception e) {
+	            log.error("Pull Message Service Run Method exception", e);
+	        }
+	    }
+	
+	    log.info(this.getServiceName() + " service end");
+	}
 
     @Override
     public void shutdown(boolean interrupt) {

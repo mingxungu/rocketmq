@@ -59,7 +59,6 @@ public class MQClientManager {
                 log.info("Created new MQClientInstance for clientId:[{}]", clientId);
             }
         }
-
         return instance;
     }
 

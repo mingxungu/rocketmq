@@ -261,7 +261,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         if (cachedMessageSizeInMiB > this.defaultMQPushConsumer.getPullThresholdSizeForQueue()) {
         	//等待50毫秒再将pullRequest回收到PullMessageService.pullRequestQueue中,供下一次使用
             this.executePullRequestLater(pullRequest, PULL_TIME_DELAY_MILLS_WHEN_FLOW_CONTROL);
-            //每1000次，抛出一个警告做流量控制实际就是说明，处理队列处理消息慢
+            //每1000次，抛出一个警告做流量控制实际就是说明，消息字节比较大
             if ((queueFlowControlTimes++ % 1000) == 0) {
                 log.warn(
                     "the cached message size exceeds the threshold {} MiB, so do flow control, minOffset={}, maxOffset={}, count={}, size={} MiB, pullRequest={}, flowControlTimes={}",
@@ -343,7 +343,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                                     pullRequest.getMessageQueue().getTopic(), pullResult.getMsgFoundList().size());
                                 
                                 boolean dispatchToConsume = processQueue.putMessage(pullResult.getMsgFoundList());
-                                //核心方法，处理消息的消费和消费状态后的处理
+                                //核心方法，处理消息的消费和消费状态后的处理(异步消息处理)
                                 DefaultMQPushConsumerImpl.this.consumeMessageService.submitConsumeRequest(
                                     pullResult.getMsgFoundList(),
                                     processQueue,
@@ -453,6 +453,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             classFilter // class filter
         );
         try {
+        	//拉取消息
             this.pullAPIWrapper.pullKernelImpl(
                 pullRequest.getMessageQueue(),
                 subExpression,

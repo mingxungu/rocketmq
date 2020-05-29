@@ -39,6 +39,7 @@ public class RebalanceService extends ServiceThread {
         while (!this.isStopped()) {
         	//等待20秒进行重平衡
             this.waitForRunning(waitInterval);
+            //再平衡的核心方法
             this.mqClientFactory.doRebalance();
         }
 
