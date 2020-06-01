@@ -58,12 +58,14 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
     @Override
     public void updateOffset(MessageQueue mq, long offset, boolean increaseOnly) {
         if (mq != null) {
+        	//获取当前队列的之前的偏移量
             AtomicLong offsetOld = this.offsetTable.get(mq);
             if (null == offsetOld) {
                 offsetOld = this.offsetTable.putIfAbsent(mq, new AtomicLong(offset));
             }
-
+            
             if (null != offsetOld) {
+            	//是否需要做一次判断，比较旧的偏移量和新的哪一个大，依照大的作为最新的偏移量
                 if (increaseOnly) {
                     MixAll.compareAndIncreaseOnly(offsetOld, offset);
                 } else {
@@ -122,8 +124,10 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
                 MessageQueue mq = entry.getKey();
                 AtomicLong offset = entry.getValue();
                 if (offset != null) {
+                	//判断该消息队列是否有偏移量，没有的直接移除
                     if (mqs.contains(mq)) {
                         try {
+                        	//远程更新broker端的位移
                             this.updateConsumeOffsetToBroker(mq, offset.get());
                             log.info("[persistAll] Group: {} ClientId: {} updateConsumeOffsetToBroker {} {}",
                                 this.groupName,
@@ -139,7 +143,7 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
                 }
             }
         }
-
+        //无用的移除
         if (!unusedMQ.isEmpty()) {
             for (MessageQueue mq : unusedMQ) {
                 this.offsetTable.remove(mq);
@@ -202,6 +206,7 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
     @Override
     public void updateConsumeOffsetToBroker(MessageQueue mq, long offset, boolean isOneway) throws RemotingException,
         MQBrokerException, InterruptedException, MQClientException {
+    	// 获取broker信息
         FindBrokerResult findBrokerResult = this.mQClientFactory.findBrokerAddressInAdmin(mq.getBrokerName());
         if (null == findBrokerResult) {
 
@@ -210,6 +215,7 @@ public class RemoteBrokerOffsetStore implements OffsetStore {
         }
 
         if (findBrokerResult != null) {
+        	// 构造请求的header
             UpdateConsumerOffsetRequestHeader requestHeader = new UpdateConsumerOffsetRequestHeader();
             requestHeader.setTopic(mq.getTopic());
             requestHeader.setConsumerGroup(this.groupName);

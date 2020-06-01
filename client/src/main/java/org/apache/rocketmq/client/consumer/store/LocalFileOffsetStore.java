@@ -132,18 +132,20 @@ public class LocalFileOffsetStore implements OffsetStore {
     public void persistAll(Set<MessageQueue> mqs) {
         if (null == mqs || mqs.isEmpty())
             return;
-
+        //偏移量序列化对象
         OffsetSerializeWrapper offsetSerializeWrapper = new OffsetSerializeWrapper();
         for (Map.Entry<MessageQueue, AtomicLong> entry : this.offsetTable.entrySet()) {
             if (mqs.contains(entry.getKey())) {
                 AtomicLong offset = entry.getValue();
+                //设置每一个消息队列的消费位移
                 offsetSerializeWrapper.getOffsetTable().put(entry.getKey(), offset);
             }
         }
-
+        //json字符串
         String jsonString = offsetSerializeWrapper.toJson(true);
         if (jsonString != null) {
             try {
+            	//写入文件（重要）
                 MixAll.string2File(jsonString, this.storePath);
             } catch (IOException e) {
                 log.error("persistAll consumer offset Exception, " + this.storePath, e);

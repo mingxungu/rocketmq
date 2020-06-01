@@ -145,19 +145,21 @@ public class MixAll {
     }
 
     public static void string2File(final String str, final String fileName) throws IOException {
-
+    	//创建临时文件
         String tmpFile = fileName + ".tmp";
         string2FileNotSafe(str, tmpFile);
-
+        //创建备份文件
         String bakFile = fileName + ".bak";
+        //读取之前的偏移量文件中的内容
         String prevContent = file2String(fileName);
         if (prevContent != null) {
+        	//存在就创建备份文件
             string2FileNotSafe(prevContent, bakFile);
         }
-
+        //删除原有的偏移量文件
         File file = new File(fileName);
         file.delete();
-
+        //将临时文件重命名为正式偏移量文件
         file = new File(tmpFile);
         file.renameTo(new File(fileName));
     }

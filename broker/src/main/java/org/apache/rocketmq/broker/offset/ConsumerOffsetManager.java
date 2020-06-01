@@ -120,8 +120,9 @@ public class ConsumerOffsetManager extends ConfigManager {
 
     public void commitOffset(final String clientHost, final String group, final String topic, final int queueId,
         final long offset) {
-        // topic@group
+    	//构建Map的key=topic@group
         String key = topic + TOPIC_GROUP_SEPARATOR + group;
+        //提交
         this.commitOffset(clientHost, key, queueId, offset);
     }
 
@@ -130,6 +131,7 @@ public class ConsumerOffsetManager extends ConfigManager {
         if (null == map) {
             map = new ConcurrentHashMap<Integer, Long>(32);
             map.put(queueId, offset);
+            //放入集合中
             this.offsetTable.put(key, map);
         } else {
             Long storeOffset = map.put(queueId, offset);
@@ -172,6 +174,7 @@ public class ConsumerOffsetManager extends ConfigManager {
     }
 
     public String encode(final boolean prettyFormat) {
+    	//this就是本身，就一个成员变量offsetTable记录的就是client端上传的偏移量信息
         return RemotingSerializable.toJson(this, prettyFormat);
     }
 

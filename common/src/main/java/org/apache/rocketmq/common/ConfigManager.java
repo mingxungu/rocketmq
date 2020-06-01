@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.common;
 
+import java.io.File;
 import java.io.IOException;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.logging.InternalLogger;
@@ -68,10 +69,13 @@ public abstract class ConfigManager {
     public abstract void decode(final String jsonString);
 
     public synchronized void persist() {
+    	//获取偏移量的JOSN字符串
         String jsonString = this.encode(true);
         if (jsonString != null) {
+        	//获取配置文件路径rootDir + File.separator + "config" + File.separator + "consumerOffset.json"
             String fileName = this.configFilePath();
             try {
+            	//写入文件
                 MixAll.string2File(jsonString, fileName);
             } catch (IOException e) {
                 log.error("persist file " + fileName + " exception", e);
