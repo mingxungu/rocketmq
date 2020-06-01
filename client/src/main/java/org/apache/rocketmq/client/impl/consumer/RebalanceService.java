@@ -35,7 +35,6 @@ public class RebalanceService extends ServiceThread {
     @Override
     public void run() {
         log.info(this.getServiceName() + " service started");
-
         while (!this.isStopped()) {
         	//等待20秒进行重平衡
             this.waitForRunning(waitInterval);

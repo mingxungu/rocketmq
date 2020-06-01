@@ -45,7 +45,8 @@ public class MQClientManager {
     }
 
     public MQClientInstance getAndCreateMQClientInstance(final ClientConfig clientConfig, RPCHook rpcHook) {
-        String clientId = clientConfig.buildMQClientId();
+        //客户端IP+"@"+instanceName（客户端设置的不设置集群模式默认是DEFAULT，会转换为PID）+"@"+unitName(自己设置的)
+    	String clientId = clientConfig.buildMQClientId();
         MQClientInstance instance = this.factoryTable.get(clientId);
         if (null == instance) {
             instance =

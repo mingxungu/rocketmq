@@ -295,19 +295,21 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
                 //返回RECONSUME_LATER才会进入
                 for (int i = ackIndex + 1; i < consumeRequest.getMsgs().size(); i++) {
                     MessageExt msg = consumeRequest.getMsgs().get(i);
-                    //发送延迟消息到broker
+                    //发送延迟消息到broker（重要）
                     boolean result = this.sendMessageBack(msg, context);
                     //发送失败放入msgBackFailed集合中
                     if (!result) {
+                    	//消费次数+1
                         msg.setReconsumeTimes(msg.getReconsumeTimes() + 1);
+                        //放入失败的集合中
                         msgBackFailed.add(msg);
                     }
                 }
                 //1.消费结果是CONSUME_SUCCESS不会进入
-                //2.消费结果是RECONSUME_LATER，并且发送延迟消息失败的才会进入
+                //2.消费结果是RECONSUME_LATER，并且发送延迟消息失败的才会进入（做相关失败的补偿，客户端继续消费延迟5秒并增加消费次数）
                 if (!msgBackFailed.isEmpty()) {
                     consumeRequest.getMsgs().removeAll(msgBackFailed);
-                    //5秒钟后再次消费，此时的消费次数已经+1
+                    //5秒钟后再次消费，此时的消费次数已经+1（开始了一轮客户端消费）
                     this.submitConsumeRequestLater(msgBackFailed, consumeRequest.getProcessQueue(), consumeRequest.getMessageQueue());
                 }
                 break;
@@ -332,6 +334,7 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
         //在发送回消息之前用命名空间包装主题.
         msg.setTopic(this.defaultMQPushConsumer.withNamespace(msg.getTopic()));
         try {
+        	//消费失败调用broker的核心方法
             this.defaultMQPushConsumerImpl.sendMessageBack(msg, delayLevel, context.getMessageQueue().getBrokerName());
             return true;
         } catch (Exception e) {
@@ -393,12 +396,14 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
                 log.info("the message queue not be able to consume, because it's dropped. group={} {}", ConsumeMessageConcurrentlyService.this.consumerGroup, this.messageQueue);
                 return;
             }
-
+            //消费者注册的listener
             MessageListenerConcurrently listener = ConsumeMessageConcurrentlyService.this.messageListener;
             ConsumeConcurrentlyContext context = new ConsumeConcurrentlyContext(messageQueue);
             ConsumeConcurrentlyStatus status = null;
+            //如果消息来自延迟队列则设置其主题为%RETRY_TOPIC%+consumerGroup
+            //namespace一般不做设置不做分析
             defaultMQPushConsumerImpl.resetRetryAndNamespace(msgs, defaultMQPushConsumer.getConsumerGroup());
-
+            //目前只是开启了消息轨迹才会有Hook这个，（消息处理前执行）
             ConsumeMessageContext consumeMessageContext = null;
             if (ConsumeMessageConcurrentlyService.this.defaultMQPushConsumerImpl.hasHook()) {
                 consumeMessageContext = new ConsumeMessageContext();
@@ -410,7 +415,7 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
                 consumeMessageContext.setSuccess(false);
                 ConsumeMessageConcurrentlyService.this.defaultMQPushConsumerImpl.executeHookBefore(consumeMessageContext);
             }
-
+            //客户端程序消费消息的开始时间
             long beginTimestamp = System.currentTimeMillis();
             boolean hasException = false;
             ConsumeReturnType returnType = ConsumeReturnType.SUCCESS;
@@ -430,6 +435,7 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
                     messageQueue);
                 hasException = true;
             }
+            //客户端消费消息的时间
             long consumeRT = System.currentTimeMillis() - beginTimestamp;
             if (null == status) {
                 if (hasException) {
@@ -445,7 +451,7 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
             } else if (ConsumeConcurrentlyStatus.CONSUME_SUCCESS == status) {
                 returnType = ConsumeReturnType.SUCCESS;
             }
-
+            //开始可消息轨迹
             if (ConsumeMessageConcurrentlyService.this.defaultMQPushConsumerImpl.hasHook()) {
                 consumeMessageContext.getProps().put(MixAll.CONSUME_CONTEXT_TYPE, returnType.name());
             }
@@ -457,7 +463,7 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
                     messageQueue);
                 status = ConsumeConcurrentlyStatus.RECONSUME_LATER;
             }
-
+            //目前只是开启了消息轨迹才会有Hook这个，（消息处理前执行）
             if (ConsumeMessageConcurrentlyService.this.defaultMQPushConsumerImpl.hasHook()) {
                 consumeMessageContext.setStatus(status.toString());
                 consumeMessageContext.setSuccess(ConsumeConcurrentlyStatus.CONSUME_SUCCESS == status);

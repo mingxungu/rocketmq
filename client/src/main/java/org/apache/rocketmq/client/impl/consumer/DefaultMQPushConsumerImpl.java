@@ -554,8 +554,9 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             MessageAccessor.putProperty(newMsg, MessageConst.PROPERTY_RETRY_TOPIC, msg.getTopic());
             MessageAccessor.setReconsumeTime(newMsg, String.valueOf(msg.getReconsumeTimes() + 1));
             MessageAccessor.setMaxReconsumeTimes(newMsg, String.valueOf(getMaxReconsumeTimes()));
+            //延迟队列（消息重试也是利用了延迟队列，但是是从第三级开始）
             newMsg.setDelayTimeLevel(3 + msg.getReconsumeTimes());
-            //失败了就构建本地客户端的producer发送到broker
+            //失败了就构建本地客户端的producer发送到broker（补偿机制）
             this.mQClientFactory.getDefaultMQProducer().send(newMsg);
         } finally {
             msg.setTopic(NamespaceUtil.withoutNamespace(msg.getTopic(), this.defaultMQPushConsumer.getNamespace()));

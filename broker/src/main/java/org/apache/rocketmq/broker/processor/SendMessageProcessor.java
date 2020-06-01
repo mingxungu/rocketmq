@@ -174,9 +174,9 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
             MessageAccessor.putProperty(msgExt, MessageConst.PROPERTY_RETRY_TOPIC, msgExt.getTopic());
         }
         msgExt.setWaitStoreMsgOK(false);
-
+        //获取延迟级别，默认是0
         int delayLevel = requestHeader.getDelayLevel();
-
+        //最大消费次数是16
         int maxReconsumeTimes = subscriptionGroupConfig.getRetryMaxTimes();
         if (request.getVersion() >= MQVersion.Version.V3_4_9.ordinal()) {
             maxReconsumeTimes = requestHeader.getMaxReconsumeTimes();
@@ -197,13 +197,14 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                 return response;
             }
         } else {
+        	//初始值的设置，消息构建是默认是0，延迟队列从3开始
             if (0 == delayLevel) {
                 delayLevel = 3 + msgExt.getReconsumeTimes();
             }
-
+            //已经是延迟队列了，直接设置
             msgExt.setDelayTimeLevel(delayLevel);
         }
-
+        //构建延迟消息
         MessageExtBrokerInner msgInner = new MessageExtBrokerInner();
         msgInner.setTopic(newTopic);
         msgInner.setBody(msgExt.getBody());

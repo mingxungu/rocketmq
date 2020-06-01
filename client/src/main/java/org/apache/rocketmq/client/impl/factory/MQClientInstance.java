@@ -223,40 +223,40 @@ public class MQClientInstance {
         return mqList;
     }
 
-    public void start() throws MQClientException {
+public void start() throws MQClientException {
 
-        synchronized (this) {
-            switch (this.serviceState) {
-                case CREATE_JUST:
-                    this.serviceState = ServiceState.START_FAILED;
-                    // If not specified,looking address from name server
-                    if (null == this.clientConfig.getNamesrvAddr()) {
-                        this.mQClientAPIImpl.fetchNameServerAddr();
-                    }
-                    // Start request-response channel
-                    this.mQClientAPIImpl.start();
-                    //启动各种定时器
-                    this.startScheduledTask();
-                    //开启拉取消息的服务（还没进行重平衡pullRequestQueue里面是空）
-                    this.pullMessageService.start();
-                    //开始再平衡服务（等待20秒进行重平衡）
-                    this.rebalanceService.start();
-                    // Start push service
-                    this.defaultMQProducer.getDefaultMQProducerImpl().start(false);
-                    log.info("the client factory [{}] start OK", this.clientId);
-                    this.serviceState = ServiceState.RUNNING;
-                    break;
-                case RUNNING:
-                    break;
-                case SHUTDOWN_ALREADY:
-                    break;
-                case START_FAILED:
-                    throw new MQClientException("The Factory object[" + this.getClientId() + "] has been created before, and failed.", null);
-                default:
-                    break;
-            }
+    synchronized (this) {
+        switch (this.serviceState) {
+            case CREATE_JUST:
+                this.serviceState = ServiceState.START_FAILED;
+                // If not specified,looking address from name server
+                if (null == this.clientConfig.getNamesrvAddr()) {
+                    this.mQClientAPIImpl.fetchNameServerAddr();
+                }
+                // Start request-response channel
+                this.mQClientAPIImpl.start();
+                //启动各种定时器
+                this.startScheduledTask();
+                //开启拉取消息的服务（还没进行重平衡pullRequestQueue里面是空）
+                this.pullMessageService.start();
+                //开始再平衡服务（等待20秒进行重平衡）
+                this.rebalanceService.start();
+                // Start push service
+                this.defaultMQProducer.getDefaultMQProducerImpl().start(false);
+                log.info("the client factory [{}] start OK", this.clientId);
+                this.serviceState = ServiceState.RUNNING;
+                break;
+            case RUNNING:
+                break;
+            case SHUTDOWN_ALREADY:
+                break;
+            case START_FAILED:
+                throw new MQClientException("The Factory object[" + this.getClientId() + "] has been created before, and failed.", null);
+            default:
+                break;
         }
     }
+}
 
     private void startScheduledTask() {
     	//定时获取name server address地址信息 2分钟获取一次
